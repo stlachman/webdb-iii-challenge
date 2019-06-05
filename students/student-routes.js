@@ -29,6 +29,17 @@ router.get("/:id", validateId, (req, res) => {
   res.status(200).json(req.student);
 });
 
+router.delete("/:id", validateId, (req, res) => {
+  const { id } = req.params;
+  Students.remove(id)
+    .then(removedStudent => {
+      res.status(204).end();
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Error deleting student" });
+    });
+});
+
 function validateStudentInfo(req, res, next) {
   if (!req.body.name) {
     res.status(400).json({ message: "Missing required name field" });
@@ -43,7 +54,7 @@ function validateId(req, res, next) {
   const { id } = req.params;
   Students.findById(id)
     .then(student => {
-      if (student) {
+      if (student && student.length) {
         req.student = student;
         next();
       } else {
