@@ -25,6 +25,39 @@ router.get("/", (req, res) => {
     });
 });
 
+// READ - GET /api/cohorts/:id
+router.get("/:id", validateId, (req, res) => {
+  res.status(200).json(req.cohort);
+});
+
+// READ - GET /api/cohorts/:id/students
+router.get("/:id/students", validateId, (req, res) => {
+  Cohorts.getCohortStudents(req.cohort.id)
+    .then(students => {
+      res.status(200).json(students);
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Error retrieving students" });
+    });
+});
+
+// Middleware
+function validateId(req, res, next) {
+  const { id } = req.params;
+  Cohorts.findById(id)
+    .then(cohort => {
+      if (cohort) {
+        req.cohort = cohort;
+        next();
+      } else {
+        res.status(404).json({ message: "No cohort with that id" });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Error retrieving cohorts" });
+    });
+}
+
 function validateBody(req, res, next) {
   if (req.body.name) {
     next();
