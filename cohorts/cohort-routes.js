@@ -41,6 +41,29 @@ router.get("/:id/students", validateId, (req, res) => {
     });
 });
 
+// UPDATE - PUT /api/cohorts/:id
+router.put("/:id", validateId, (req, res) => {
+  Cohorts.update(req.body, req.params.id)
+    .then(updatedCohort => {
+      res.status(201).json(updatedCohort);
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Error updating cohort" });
+    });
+});
+
+// DELETE - DELETE /api/cohorts/:id
+router.delete("/:id", validateId, (req, res) => {
+  const { id } = req.params;
+  Cohorts.remove(id)
+    .then(removedCohort => {
+      res.status(204).end();
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Error deleting cohort" });
+    });
+});
+
 // Middleware
 function validateId(req, res, next) {
   const { id } = req.params;
