@@ -29,6 +29,20 @@ router.get("/:id", validateId, (req, res) => {
   res.status(200).json(req.student);
 });
 
+// UDPATE - PUT /api/students/:id
+router.put("/:id", validateId, (req, res) => {
+  const { id } = req.params;
+  const updatedStudent = req.body;
+  Students.update(updatedStudent, id)
+    .then(student => {
+      res.status(201).json(student);
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Error updating student" });
+    });
+});
+
+// DELETE - DELETE /api/students/:id
 router.delete("/:id", validateId, (req, res) => {
   const { id } = req.params;
   Students.remove(id)
