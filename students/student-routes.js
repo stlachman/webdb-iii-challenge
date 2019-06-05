@@ -2,6 +2,7 @@ const router = require("express").Router();
 
 const Students = require("./students-model");
 
+// CREATE - POST /api/students
 router.post("/", validateStudentInfo, (req, res) => {
   Students.add(req.body)
     .then(student => {
@@ -12,6 +13,7 @@ router.post("/", validateStudentInfo, (req, res) => {
     });
 });
 
+// READ - GET /api/students
 router.get("/", (req, res) => {
   Students.find()
     .then(students => {
@@ -22,6 +24,11 @@ router.get("/", (req, res) => {
     });
 });
 
+// READ - GET /api/students/:id
+router.get("/:id", validateId, (req, res) => {
+  res.status(200).json(req.student);
+});
+
 function validateStudentInfo(req, res, next) {
   if (!req.body.name) {
     res.status(400).json({ message: "Missing required name field" });
@@ -30,6 +37,22 @@ function validateStudentInfo(req, res, next) {
   } else {
     next();
   }
+}
+
+function validateId(req, res, next) {
+  const { id } = req.params;
+  Students.findById(id)
+    .then(student => {
+      if (student) {
+        req.student = student;
+        next();
+      } else {
+        res.status(404).json({ message: "No student with that id" });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Error retrieving student" });
+    });
 }
 
 module.exports = router;
